@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db, bcrypt
-from app.forms import LoginForm, RegistrationForm
+from app.forms import LoginForm, RegistrationForm, UpdateAccountForm, PasswordChangeForm
 from app.models import User
 
 
@@ -16,6 +16,7 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     form = RegistrationForm()
+
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user = User(username=form.username.data, email=form.email.data, password=hashed_password)
@@ -47,7 +48,31 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route('/account')
+@app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
-    return render_template('account.html')
+    update_form = UpdateAccountForm()
+    password_form = PasswordChangeForm()
+
+    if update_form.validate_on_submit():
+        current_user.username = update_form.username.data
+        current_user.email = update_form.email.data
+        db.session.commit()
+        flash('Your account has been updated!', 'success')
+        return redirect(url_for('account'))
+
+    elif request.method == 'GET':
+        update_form.username.data = current_user.username
+        update_form.email.data = current_user.email
+
+    if password_form.validate_on_submit():
+        if bcrypt.check_password_hash(current_user.password, password_form.current_password.data):
+            hashed_password = bcrypt.generate_password_hash(password_form.new_password.data).decode('utf-8')
+            current_user.password = hashed_password
+            db.session.commit()
+            flash('Your password has been updated!', 'success')
+            return redirect(url_for('account'))
+        else:
+            flash('Current password is incorrect.', 'danger')
+
+    return render_template('account.html', update_form=update_form, password_form=password_form)

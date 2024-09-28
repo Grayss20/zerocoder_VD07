@@ -7,4 +7,45 @@
 {% block content %}
     <h1>Ваш аккаунт</h1>
     <p>Это страница вашего аккаунта.</p>
+<br>
+<hr>
+<br>
+    <h2>Update Account</h2>
+
+    <form method="POST">
+        {{ update_form.hidden_tag() }}
+        <div class="form-group">
+            {{ update_form.username.label(class="form-label") }}
+            {{ update_form.username(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ update_form.email.label(class="form-label") }}
+            {{ update_form.email(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ update_form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+
+    <hr>
+
+    <h2>Change Password</h2>
+    <form method="POST">
+        {{ password_form.hidden_tag() }}
+        <div class="form-group">
+            {{ password_form.current_password.label(class="form-label") }}
+            {{ password_form.current_password(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ password_form.new_password.label(class="form-label") }}
+            {{ password_form.new_password(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ password_form.confirm_password.label(class="form-label") }}
+            {{ password_form.confirm_password(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ password_form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
 {% endblock %}
